@@ -1,6 +1,6 @@
 # pdfrate
 
-Code and data used by pdfrate:
+Code and data used by pdfrate and associated evasion studies:
 
 [pdfrate] C. Smutz and A. Stavrou, “Malicious PDF Detection Using Metadata and Structural Features,” in Proceedings of the 28th Annual Computer Security Applications Conference, New York, NY, USA, 2012, pp. 239–248.
 
@@ -29,6 +29,7 @@ This data is not exactly the same as that used by the original pdfrate in all ca
 - These CSVs were created using the mimicus feature extractor
 - All files used in these CSVs are available (or at least were available) on Virustotal as well as other sources.
   - The university classifier changed multiple times thoughout the operation of pdfrate.com and it contained files not publicly available. The data provided seeks to replicate this classifier qualitatively but many specific samples had to be substituted
+  - The university classifier CSV has been split into 4 pieces to fit under common file upload/attachment limits. Simply concatenate this file to reconstruct the complete CSV
   
 
 
