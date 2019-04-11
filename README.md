@@ -26,6 +26,13 @@ This data is suitable for exercises to introduce machine learning as well as stu
 
 This data is not exactly the same as that used by the original pdfrate in all cases, but it intended to be as similar as possible and have nearly identical properties. Any discrepencies should be very small. 
 
+
+- These CSVs were created using the mimicus feature extractor
+- All files used in these CSVs are available (or at least were available) on Virustotal as well as other sources.
+  - The university classifier changed multiple times thoughout the operation of pdfrate.com and it contained files not publicly available. The data provided seeks to replicate this classifier qualitatively but many specific samples had to be substituted
+  - The university classifier CSV has been split into 4 pieces to fit under common file upload/attachment limits. Simply concatenate this file to reconstruct the complete CSV
+
+
 ## Exercise
 
 Basic exercise using PDFrate data and mimicus code
@@ -69,13 +76,4 @@ model.apply(X)
 import pickle
 pickle.dump(model, open("example.model", 'wb+'))
 model = pickle.load(open("example.model", 'rb+'))
-
-
-
-- These CSVs were created using the mimicus feature extractor
-- All files used in these CSVs are available (or at least were available) on Virustotal as well as other sources.
-  - The university classifier changed multiple times thoughout the operation of pdfrate.com and it contained files not publicly available. The data provided seeks to replicate this classifier qualitatively but many specific samples had to be substituted
-  - The university classifier CSV has been split into 4 pieces to fit under common file upload/attachment limits. Simply concatenate this file to reconstruct the complete CSV
 ```  
-
-
