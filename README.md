@@ -26,10 +26,56 @@ This data is suitable for exercises to introduce machine learning as well as stu
 
 This data is not exactly the same as that used by the original pdfrate in all cases, but it intended to be as similar as possible and have nearly identical properties. Any discrepencies should be very small. 
 
+## Exercise
+
+Basic exercise using PDFrate data and mimicus code
+
+- Extract features, train and use model
+- What features are most heavily used?
+- Which samples in training are redundant?
+- Replicate or study specific attack methods
+- Can you construct evasive sample?
+- Construct other model types, compare
+- Visualize classifier (construct trees)
+- Why is University better than Contagio?
+- Explain rationale for a given prediction
+
+```
+#create test csvs, samples is directory with pdfs:
+./featureextractor.py --ben <(find samples -type f) eval.csv
+
+#load dataset
+import mimicus.tools.datasets
+X, y, names = mimicus.tools.datasets.csv2numpy("train.csv")
+
+
+#train model
+from sklearn.ensemble import RandomForestClassifier as RF
+model = RF(n_estimators=100, n_jobs=-1, oob_score=True)
+model.fit(X,y)
+
+#info about model
+model.oob_score_
+model.feature_importances_
+
+#predict, predict showing votes
+model.predict(X)
+model.predict_proba(X)
+
+#leaf nodes
+model.apply(X)
+
+#serialize/deserialize classifier
+import pickle
+pickle.dump(model, open("example.model", 'wb+'))
+model = pickle.load(open("example.model", 'rb+'))
+
+
+
 - These CSVs were created using the mimicus feature extractor
 - All files used in these CSVs are available (or at least were available) on Virustotal as well as other sources.
   - The university classifier changed multiple times thoughout the operation of pdfrate.com and it contained files not publicly available. The data provided seeks to replicate this classifier qualitatively but many specific samples had to be substituted
   - The university classifier CSV has been split into 4 pieces to fit under common file upload/attachment limits. Simply concatenate this file to reconstruct the complete CSV
-  
+```  
 
 
