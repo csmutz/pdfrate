@@ -24,6 +24,7 @@ my $width;
 my $height;
 my $desc;
 
+my $medium_output = 0;
 my $extended_output = 0;
 my $hash_output = 0;
 my $hex_output = 0;
@@ -35,6 +36,12 @@ foreach $filename (@ARGV)
 {
     #print("$filename:\n");
     
+    if ($filename eq "-m")
+    {
+        $medium_output = 1;
+        next;
+    }
+
     if ($filename eq "-x")
     {
 	$extended_output = 1;
@@ -88,7 +95,7 @@ foreach $filename (@ARGV)
     
    
     #classic /Metadata
-    while ($contents =~ m/\/(F|ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL)\s?\(((?:[^\)]|(?:(?<=\\))\)){0,$max_value_length})\)/sg )
+    while ($contents =~ m/\/(F|ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL|URI)\s?\(((?:[^\)]|(?:(?<=\\))\)){0,$max_value_length})\)/sg )
     {
         $pos = sprintf("%08X", $-[0]);
         $raw_match = substr($contents,$-[0],($+[0] - $-[0]));
@@ -112,7 +119,7 @@ foreach $filename (@ARGV)
     }
     
     #hex /Metadata
-    while ($contents =~ m/\/(ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL)\s?\<(?:FEFF)?([^\>]{0,$max_value_length_hex})\>/sg )
+    while ($contents =~ m/\/(ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL|URI)\s?\<(?:FEFF)?([^\>]{0,$max_value_length_hex})\>/sg )
     {
         $pos = sprintf("%08X", $-[0]);
         $raw_match = substr($contents,$-[0],($+[0] - $-[0]));
@@ -130,7 +137,7 @@ foreach $filename (@ARGV)
     }
     
     #xml <pdf:Metadata>
-    while ($contents =~ m/\<(?:pdf|xmp|xap|pdfx|xapMM|xmpMM):(ModifyDate|CreateDate|MetadataDate|Title|CreatorTool|Author|Producer|Company|Subject|Keywords|URL|DocumentID|InstanceID)\>(.{0,$max_value_length})\<\/(?:pdf|xmp|xap|pdfx|xapMM|xmpMM):\1\>/sg )
+    while ($contents =~ m/\<(?:pdf|xmp|xap|pdfx|xapMM|xmpMM):(ModifyDate|CreateDate|MetadataDate|Title|CreatorTool|Author|Producer|Company|Subject|Keywords|URL|URI|DocumentID|InstanceID)\>(.{0,$max_value_length})\<\/(?:pdf|xmp|xap|pdfx|xapMM|xmpMM):\1\>/sg )
     {
         $pos = sprintf("%08X", $-[0]);
         $raw_match = substr($contents,$-[0],($+[0] - $-[0]));
@@ -163,7 +170,7 @@ foreach $filename (@ARGV)
     #00000f20  6a 0a 3c 3c 20 2f 54 69  74 6c 65 20 31 32 20 30  |j.<< /Title 12 0|
     #00000f30  20 52 20 2f 50 72 6f 64  75 63 65 72 20 31 33 20  | R /Producer 13 |
     
-    while ($contents =~ m/\/(F|ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL)[ \n]([0-9]+[ \n][0-9]+)[ \n]R/sg )
+    while ($contents =~ m/\/(F|ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL|URI)[ \n]([0-9]+[ \n][0-9]+)[ \n]R/sg )
     {
         $name = $1;
         $pos = $2;
@@ -205,11 +212,27 @@ foreach $filename (@ARGV)
     }
     
     
-    if ($extended_output || $hash_output)
+    if ($extended_output || $hash_output || $medium_output)
     {
 	
-    #/Mediabox [ 0 0 1 1 ] --- For page sizes
+
+    #FONT Names
+    #/BaseFont\s?/[^\s/]+
+    while ($contents =~ m/\/BaseFont\s?\/([^\s\/]{0,$max_value_length})/sg )
+    {
+        $pos = sprintf("%08X", $-[1]);
+        $raw_match = substr($contents,$-[1] - 1,($+[1] - ($-[1] - 1)));
+        $name = "BaseFont";
+        $value = $1;
+        #filter unprintables
+        $value =~ s/[^[:print:]]/\./g;
+        $value =~ s/[\r\n\t]/ /g;
+        #print($pos." ".sprintf("%16s",$name).": ".$value."\n");
+        output($pos,$name,$value,$raw_match);
+    }
+
     
+    #/Mediabox [ 0 0 1 1 ] --- For page sizes
     #while ($contents =~ m/\/(MediaBox) ?\[ ?([0-9\.]{0,12}) ([0-9\.]{0,12}) ([0-9\.]{0,12}) ([0-9\.]{0,12}) ?\]/g )
     while ($contents =~ m/\[ ?([0-9\.-]{0,12}) ([0-9\.-]{0,12}) ([0-9\.-]{0,12}) ([0-9\.-]{0,12}) ?\]/g )
     {
@@ -299,7 +322,11 @@ foreach $filename (@ARGV)
         }
         output($pos,$name,$out_value,$raw_match);
     }
-
+    
+    } #end medium output 
+    
+    if ($extended_output || $hash_output)
+    {
 	#for filters......
 	#filter abbreviations
 	#    ASCIIHexDecode -> AHx
@@ -424,30 +451,12 @@ sub output()
         }
     } else
     {
-        print($pos." ".sprintf("%16s",$name).": $value\n");
+        print(lc($pos)." ".sprintf("%16s",$name).": $value\n");
     }
     
     
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
