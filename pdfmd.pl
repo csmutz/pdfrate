@@ -95,7 +95,7 @@ foreach $filename (@ARGV)
     
    
     #classic /Metadata
-    while ($contents =~ m/\/(F|ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL|URI)\s?\(((?:[^\)]|(?:(?<=\\))\)){0,$max_value_length})\)/sg )
+    while ($contents =~ m/\/(F|ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL|URI|Lang)\s?\(((?:[^\)]|(?:(?<=\\))\)){0,$max_value_length})\)/sg )
     {
         $pos = sprintf("%08X", $-[0]);
         $raw_match = substr($contents,$-[0],($+[0] - $-[0]));
@@ -119,7 +119,7 @@ foreach $filename (@ARGV)
     }
     
     #hex /Metadata
-    while ($contents =~ m/\/(ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL|URI)\s?\<(?:FEFF)?([^\>]{0,$max_value_length_hex})\>/sg )
+    while ($contents =~ m/\/(ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL|URI|Lang)\s?\<(?:FEFF)?([^\>]{0,$max_value_length_hex})\>/sg )
     {
         $pos = sprintf("%08X", $-[0]);
         $raw_match = substr($contents,$-[0],($+[0] - $-[0]));
@@ -137,7 +137,7 @@ foreach $filename (@ARGV)
     }
     
     #xml <pdf:Metadata>
-    while ($contents =~ m/\<(?:pdf|xmp|xap|pdfx|xapMM|xmpMM):(ModifyDate|CreateDate|MetadataDate|Title|CreatorTool|Author|Producer|Company|Subject|Keywords|URL|URI|DocumentID|InstanceID)\>(.{0,$max_value_length})\<\/(?:pdf|xmp|xap|pdfx|xapMM|xmpMM):\1\>/sg )
+    while ($contents =~ m/\<(?:pdf|xmp|xap|pdfx|xapMM|xmpMM):(ModifyDate|CreateDate|MetadataDate|Title|CreatorTool|Author|Producer|Company|Subject|Keywords|URL|URI|DocumentID|InstanceID|Lang)\>(.{0,$max_value_length})\<\/(?:pdf|xmp|xap|pdfx|xapMM|xmpMM):\1\>/sg )
     {
         $pos = sprintf("%08X", $-[0]);
         $raw_match = substr($contents,$-[0],($+[0] - $-[0]));
@@ -170,7 +170,7 @@ foreach $filename (@ARGV)
     #00000f20  6a 0a 3c 3c 20 2f 54 69  74 6c 65 20 31 32 20 30  |j.<< /Title 12 0|
     #00000f30  20 52 20 2f 50 72 6f 64  75 63 65 72 20 31 33 20  | R /Producer 13 |
     
-    while ($contents =~ m/\/(F|ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL|URI)[ \n]([0-9]+[ \n][0-9]+)[ \n]R/sg )
+    while ($contents =~ m/\/(F|ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL|URI|Lang)[ \n]([0-9]+[ \n][0-9]+)[ \n]R/sg )
     {
         $name = $1;
         $pos = $2;
@@ -381,7 +381,7 @@ foreach $filename (@ARGV)
     while ($contents =~ m/([0-9]+\s[0-9]\sR|obj|endobj|stream|endstream|xref|trailer|startxref|%EOF|\/(?:J|#4A)(?:S|#53)|\/(?:P|#50)(?:a|#61)(?:g|#67)(?:e|#65)|\/(?:E|#45)(?:n|#6e)(?:c|#63)(?:r|#72)(?:y|#79)(?:p|#70)(?:t|#74)|\/(?:O|#4f)(?:b|#62)(?:j|#6a)(?:S|#53)(?:t|#74)(?:m|#6d)|\/(?:J|#4a)(?:a|#61)(?:v|#76)(?:a|#61)(?:S|#53)(?:c|#63)(?:r|#72)(?:i|#69)(?:p|#70)(?:t|#74)|\/(?:A|#41)(?:A|#41)|\/(?:O|#4f)(?:p|#70)(?:e|#65)(?:n|#6e)(?:A|#41)(?:c|#63)(?:t|#74)(?:i|#69)(?:o|#6f)(?:n|#6e)|\/(?:A|#41)(?:c|#63)(?:r|#72)(?:o|#6f)(?:F|#46)(?:o|#6f)(?:r|#72)(?:m|#6d)|\/(?:R|#52)(?:i|#69)(?:c|#63)(?:h|#68)(?:M|#4d)(?:e|#65)(?:d|#64)(?:i|#69)(?:a|#61)|\/(?:L|#4c)(?:a|#61)(?:u|#75)(?:n|#6e)(?:c|#63)(?:h|#68)|\/(?:C|#43)(?:o|#6f)(?:l|#6c)(?:o|#6f)(?:r|#72)(?:s|#73)|\/(?:F|#46)(?:o|#6f)(?:n|#6e)(?:t|#74))[^A-Za-z#]/sg )
     {
 	$pos = sprintf("%08X", $-[0]);
-        $raw_match = substr($contents,$-[0],($+[0] - $-[0]));
+        $raw_match = substr($contents,$-[0],($+[0] - 1 - $-[0]));
         $name = "Structure";
 	$value = $1;
 	
@@ -443,7 +443,7 @@ sub output()
         {
             $last_pdfid0 = $name.": ".$value;
         }
-        if (($name ne 'PdfID0') && ($name ne 'Filename') && ($name ne 'Structure') && ($name ne 'Filter'))
+        if (($name ne 'PdfID0') && ($name ne 'Filename') && ($name ne 'Size') && ($value !~ m/[0-9]+\s[0-9]\sR/ ))
         {
             $hexdump = unpack( 'H*', $rawbytes );
             $hexdump =~ s/(..)/$1 /g;
