@@ -95,7 +95,7 @@ foreach $filename (@ARGV)
     
    
     #classic /Metadata
-    while ($contents =~ m/\/(F|ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL|URI|Lang)\s?\(((?:[^\)]|(?:(?<=\\))\)){0,$max_value_length})\)/sg )
+    while ($contents =~ m/\/(F|ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL|URI|Lang|Language)\s?\(((?:[^\)]|(?:(?<=\\))\)){0,$max_value_length})\)/sg )
     {
         $pos = sprintf("%08X", $-[0]);
         $raw_match = substr($contents,$-[0],($+[0] - $-[0]));
@@ -119,7 +119,7 @@ foreach $filename (@ARGV)
     }
     
     #hex /Metadata
-    while ($contents =~ m/\/(ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL|URI|Lang)\s?\<(?:FEFF)?([^\>]{0,$max_value_length_hex})\>/sg )
+    while ($contents =~ m/\/(ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL|URI|Lang|Language)\s?\<(?:FEFF)?([^\>]{0,$max_value_length_hex})\>/sg )
     {
         $pos = sprintf("%08X", $-[0]);
         $raw_match = substr($contents,$-[0],($+[0] - $-[0]));
@@ -137,7 +137,7 @@ foreach $filename (@ARGV)
     }
     
     #xml <pdf:Metadata>
-    while ($contents =~ m/\<(?:pdf|xmp|xap|pdfx|xapMM|xmpMM):(ModifyDate|CreateDate|MetadataDate|Title|CreatorTool|Author|Producer|Company|Subject|Keywords|URL|URI|DocumentID|InstanceID|Lang)\>(.{0,$max_value_length})\<\/(?:pdf|xmp|xap|pdfx|xapMM|xmpMM):\1\>/sg )
+    while ($contents =~ m/\<(?:pdf|xmp|xap|pdfx|xapMM|xmpMM):(ModifyDate|CreateDate|MetadataDate|Title|CreatorTool|Author|Producer|Company|Subject|Keywords|URL|URI|DocumentID|InstanceID|Lang|Language)\>(.{0,$max_value_length})\<\/(?:pdf|xmp|xap|pdfx|xapMM|xmpMM):\1\>/sg )
     {
         $pos = sprintf("%08X", $-[0]);
         $raw_match = substr($contents,$-[0],($+[0] - $-[0]));
@@ -170,7 +170,7 @@ foreach $filename (@ARGV)
     #00000f20  6a 0a 3c 3c 20 2f 54 69  74 6c 65 20 31 32 20 30  |j.<< /Title 12 0|
     #00000f30  20 52 20 2f 50 72 6f 64  75 63 65 72 20 31 33 20  | R /Producer 13 |
     
-    while ($contents =~ m/\/(F|ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL|URI|Lang)[ \n]([0-9]+[ \n][0-9]+)[ \n]R/sg )
+    while ($contents =~ m/\/(F|ModDate|CreationDate|Title|Creator|Author|Producer|Company|Subject|Keywords|URL|URI|Lang|Language)[ \n]([0-9]+[ \n][0-9]+)[ \n]R/sg )
     {
         $name = $1;
         $pos = $2;
